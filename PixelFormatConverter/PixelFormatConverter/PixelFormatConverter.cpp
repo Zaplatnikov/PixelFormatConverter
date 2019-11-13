@@ -188,7 +188,7 @@ bool zs::PixelFormatConverter::RGB24_to_BGR24(Frame& src, Frame& dst) {
 
 	// Check input data
 	if (src.data == nullptr ||
-		src.size != src.width * src.height * 3 == 0 ||
+		src.size != src.width * src.height * 3 ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;

@@ -98,8 +98,6 @@ namespace PixelFormatConverterUnitTests
 				Assert::Fail(L"Width not equal");
 			if (srcFrame.height != dstFrame.height)
 				Assert::Fail(L"Height not equal");
-			if (srcFrame.fourcc != dstFrame.fourcc)
-				Assert::Fail(L"Fourcc not equal");
 			if (srcFrame.size != dstFrame.size)
 				Assert::Fail(L"Size not equal");
 			if (srcFrame.frameID != dstFrame.frameID)
