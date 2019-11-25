@@ -269,7 +269,7 @@ bool zs::PixelFormatConverter::RGB24_to_YUY2(Frame& src, Frame& dst) {
 
 	// Check input data
 	if (src.data == nullptr ||
-		src.size != src.size != src.width * src.height * 3 ||
+		src.size != src.width * src.height * 3 ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
@@ -367,6 +367,16 @@ bool zs::PixelFormatConverter::RGB24_to_NV12(Frame& src, Frame& dst) {
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
+
+	// Convert
+	//for (size_t i = 0; i < (size_t)src.width * (size_t)src.height; ++i)
+	//	dst.data[i] = (uint8_t)(0.299f * (float)src.data[i * 3] +
+	//		0.587f * (float)src.data[i * 3 + 1] +
+	//		0.114f * (float)src.data[i * 3 + 2]);
+	//
+	//return true;
+
+
 
 	// Convert
 	float R00, G00, B00, R01, G01, B01, R10, G10, B10, R11, G11, B11;
