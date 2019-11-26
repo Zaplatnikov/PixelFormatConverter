@@ -306,7 +306,6 @@ namespace PixelFormatConverterUnitTests
 				}//if...
 			}//for...
 
-
 		};//TEST_METHOD...
 
 
@@ -367,8 +366,7 @@ namespace PixelFormatConverterUnitTests
 			}//for...
 
 		};//TEST_METHOD...
-
-
+		
 
 		TEST_METHOD(BGR24_to_RGB24) {
 
@@ -537,6 +535,61 @@ namespace PixelFormatConverterUnitTests
 					Assert::Fail(L"Y data not equal");
 				}//if...
 				j = j + 4;
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(BGR24_to_Y800) {
+
+			// Load image
+			cv::Mat bgrImage = cv::imread("test.jpg");
+			if (bgrImage.empty())
+				Assert::Fail(L"Test image not loaded");
+
+			// Convert to GRAY
+			cv::Mat grayImage;
+			cv::cvtColor(bgrImage, grayImage, cv::COLOR_BGR2GRAY);
+
+			// Create src Frame object
+			zs::Frame bgrFrame;
+			bgrFrame.width = (uint32_t)bgrImage.size().width;
+			bgrFrame.height = (uint32_t)bgrImage.size().height;
+			bgrFrame.fourcc = MAKE_FOURCC_CODE('B', 'G', 'R', 'B');
+			bgrFrame.size = bgrFrame.width * bgrFrame.height * 3;
+			bgrFrame.sourceID = 1;
+			bgrFrame.frameID = 2;
+			bgrFrame.data = new uint8_t[bgrFrame.size];
+
+			// Copy data
+			memcpy(bgrFrame.data, bgrImage.data, bgrFrame.size);
+
+			// Convert to YUY2
+			zs::Frame grayFrame;
+			grayFrame.fourcc = MAKE_FOURCC_CODE('Y', '8', '0', '0');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(bgrFrame, grayFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+			}//if...
+
+			// Compare atributes
+			if (bgrFrame.width != grayFrame.width)
+				Assert::Fail(L"Width not equal");
+			if (bgrFrame.height != grayFrame.height)
+				Assert::Fail(L"Height not equal");
+			if (bgrFrame.size != grayFrame.size * 3)
+				Assert::Fail(L"Size not valid");
+			if (bgrFrame.frameID != grayFrame.frameID)
+				Assert::Fail(L"frameID not equal");
+			if (bgrFrame.sourceID != grayFrame.sourceID)
+				Assert::Fail(L"SourceID not equal");
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)grayFrame.size; ++i) {
+				if (abs((int)grayFrame.data[i] - (int)grayImage.data[i]) > 5) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
 			}//for...
 
 		};//TEST_METHOD...
