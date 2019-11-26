@@ -611,15 +611,13 @@ namespace PixelFormatConverterUnitTests
 			bgrFrame.sourceID = 1;
 			bgrFrame.frameID = 2;
 			bgrFrame.data = new uint8_t[bgrFrame.size];
-
-			// Copy RGB data
 			memcpy(bgrFrame.data, bgrImage.data, bgrFrame.size);
 
-			// Convert to NV12
+			// Convert image to YUV
 			cv::Mat yuvImage;
 			cv::cvtColor(bgrImage, yuvImage, cv::COLOR_BGR2YUV);
 
-			// Convert to NV12
+			// Convert frame to NV12
 			zs::Frame nv12Frame;
 			nv12Frame.fourcc = MAKE_FOURCC_CODE('N', 'V', '1', '2');
 			zs::PixelFormatConverter converter;
@@ -644,6 +642,92 @@ namespace PixelFormatConverterUnitTests
 				if (abs((int)yuvImage.data[i * 3] - (int)nv12Frame.data[i]) > 1) {
 					Assert::Fail(L"Y data not equal");
 					return;
+				}//if...
+			}//for...
+
+			// Compare U and V data
+			size_t p = 0;
+			uint8_t U0, V0, U1, V1;
+			for (size_t i = 0; i < (size_t)nv12Frame.height; i = i + 2) {
+				for (size_t j = 0; j < (size_t)nv12Frame.width; j = j + 2) {
+					U0 = yuvImage.data[i * nv12Frame.width * 3 + j * 3 + 1];
+					V0 = yuvImage.data[i * nv12Frame.width * 3 + j * 3 + 2];
+					U1 = nv12Frame.data[((size_t)nv12Frame.height + p) * (size_t)nv12Frame.width + j];
+					V1 = nv12Frame.data[((size_t)nv12Frame.height + p) * (size_t)nv12Frame.width + j + 1];
+					if (abs((int)U0 - (int)U1) > 10) {
+						Assert::Fail(L"U data not equal");
+						return;
+					}//if...
+					if (abs((int)V0 - (int)V1) > 10) {
+						Assert::Fail(L"V data not equal");
+						return;
+					}//if...
+				}//for...
+				++p;
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(UYVY_to_RGB24) {
+
+			// Load image
+			cv::Mat bgrImage = cv::imread("test.jpg");
+			if (bgrImage.empty())
+				Assert::Fail(L"Test image not loaded");
+
+			// Convert to rgb
+			cv::Mat rgbImage;
+			cv::cvtColor(bgrImage, rgbImage, cv::COLOR_BGR2RGB);
+
+			// Create RGB Frame object
+			zs::Frame sourceRGBFrame;
+			sourceRGBFrame.width = (uint32_t)rgbImage.size().width;
+			sourceRGBFrame.height = (uint32_t)rgbImage.size().height;
+			sourceRGBFrame.fourcc = MAKE_FOURCC_CODE('R', 'G', 'B', 'R');
+			sourceRGBFrame.size = sourceRGBFrame.width * sourceRGBFrame.height * 3;
+			sourceRGBFrame.sourceID = 1;
+			sourceRGBFrame.frameID = 2;
+			sourceRGBFrame.data = new uint8_t[sourceRGBFrame.size];
+			memcpy(sourceRGBFrame.data, rgbImage.data, sourceRGBFrame.size);
+
+			// Convert RGB to UYVY
+			zs::Frame uyvyFrame;
+			uyvyFrame.fourcc = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(sourceRGBFrame, uyvyFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+			}//if...
+
+			// Convert UYVY to RGB
+			zs::Frame resultRGBFrame;
+			resultRGBFrame.fourcc = MAKE_FOURCC_CODE('R', 'G', 'B', 'R');
+			if (!converter.Convert(uyvyFrame, resultRGBFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+			}//if...
+
+			// Compare atributes
+			if (sourceRGBFrame.width != resultRGBFrame.width)
+				Assert::Fail(L"Width not equal");
+			if (sourceRGBFrame.height != resultRGBFrame.height)
+				Assert::Fail(L"Height not equal");
+			if (sourceRGBFrame.size != resultRGBFrame.size)
+				Assert::Fail(L"Size not valid");
+			if (sourceRGBFrame.frameID != resultRGBFrame.frameID)
+				Assert::Fail(L"frameID not equal");
+			if (sourceRGBFrame.sourceID != resultRGBFrame.sourceID)
+				Assert::Fail(L"SourceID not equal");
+			
+			// Compare data
+			for (size_t i = 0; i < (size_t)sourceRGBFrame.size; i = i + 6) {
+				if (abs((int)sourceRGBFrame.data[i] - (int)resultRGBFrame.data[i]) > 10) {
+					Assert::Fail(L"R data not equal");
+				}//if...
+				if (abs((int)sourceRGBFrame.data[i + 1] - (int)resultRGBFrame.data[i + 1]) > 10) {
+					Assert::Fail(L"G data not equal");
+				}//if...
+				if (abs((int)sourceRGBFrame.data[i + 2] - (int)resultRGBFrame.data[i + 2]) > 10) {
+					Assert::Fail(L"B data not equal");
 				}//if...
 			}//for...
 
