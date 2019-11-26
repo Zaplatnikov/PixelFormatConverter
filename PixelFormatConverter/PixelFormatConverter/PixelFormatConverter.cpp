@@ -903,29 +903,27 @@ bool zs::PixelFormatConverter::UYVY_to_NV12(Frame& src, Frame& dst) {
 
 bool zs::PixelFormatConverter::YUY2_to_RGB24(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height * 2 ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
 	if (dst.data == nullptr || dst.size != src.width * src.height * 3) {
+
 		delete[] dst.data;
 		dst.size = src.width * src.height * 3;
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Copy atributes
 	dst.width = src.width;
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
 
-	// Convert
 	size_t j = 0;
-	float Y0, Y1, U, V, G0, G1;
+	float Y0, Y1, U, V, R0, G0, B0, R1, G1, B1;
 	for (size_t i = 0; i < (size_t)src.size; i = i + 4) {
 
 		U = (float)src.data[i + 1];
@@ -933,129 +931,145 @@ bool zs::PixelFormatConverter::YUY2_to_RGB24(Frame& src, Frame& dst) {
 		V = (float)src.data[i + 3];
 		Y1 = (float)src.data[i + 2];
 
-		dst.data[j] = (uint8_t)(Y0 + 1.140f * V);
-		dst.data[j + 2] = (uint8_t)(Y0 + 2.032f * U);
-		G0 = Y0 - 0.385f * U - 0.581 * V;
-		dst.data[j + 1] = G0 < 0 ? 0 : (uint8_t)G0;
 
-		dst.data[j + 3] = (uint8_t)(Y1 + 1.140f * V);
-		dst.data[j + 5] = (uint8_t)(Y1 + 2.032f * U);
-		G1 = Y1 - 0.385f * U - 0.581 * V;
-		dst.data[j + 4] = G1 < 0 ? 0 : (uint8_t)G1;
+		R0 = Y0 + 1.140f * (V - 128.0f);
+		G0 = Y0 - 0.395f * (U - 128.0f) - 0.581f * (V - 128.0f);
+		B0 = Y0 + 2.032f * (U - 128.0f);
+
+		R1 = Y1 + 1.140f * (V - 128.0f);
+		G1 = Y1 - 0.395f * (U - 128.0f) - 0.581f * (V - 128.0f);
+		B1 = Y1 + 2.032f * (U - 128.0f);
+
+		dst.data[j] = R0 > 255.0f ? 255 : R0 < 0.0f ? 0 : (uint8_t)R0;
+		dst.data[j + 1] = G0 > 255.0f ? 255 : G0 < 0.0f ? 0 : (uint8_t)G0;
+		dst.data[j + 2] = B0 > 255.0f ? 255 : B0 < 0.0f ? 0 : (uint8_t)B0;
+
+		dst.data[j + 3] = R1 > 255.0f ? 255 : R1 < 0.0f ? 0 : (uint8_t)R1;
+		dst.data[j + 4] = G1 > 255.0f ? 255 : G1 < 0.0f ? 0 : (uint8_t)G1;
+		dst.data[j + 5] = B1 > 255.0f ? 255 : B1 < 0.0f ? 0 : (uint8_t)B1;
 
 		j += 6;
+
 	}
 
 	return true;
 
-}//bool zs::PixelFormatConverter::YUY2_to_RGB24...
+}
 
 
 bool zs::PixelFormatConverter::YUY2_to_BGR24(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height * 2 ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
 	if (dst.data == nullptr || dst.size != src.width * src.height * 3) {
+
 		delete[] dst.data;
 		dst.size = src.width * src.height * 3;
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Copy atributes
 	dst.width = src.width;
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
 
-	// Convert
 	size_t j = 0;
-	float Y0, Y1, U, V, G0, G1;
+	float Y0, Y1, U, V, R0, G0, B0, R1, G1, B1;
 	for (size_t i = 0; i < (size_t)src.size; i = i + 4) {
+
 		U = (float)src.data[i + 1];
 		Y0 = (float)src.data[i];
 		V = (float)src.data[i + 3];
 		Y1 = (float)src.data[i + 2];
 
-		dst.data[j + 2] = (uint8_t)(Y0 + 1.140f * V);
-		dst.data[j] = (uint8_t)(Y0 + 2.032f * U);
-		G0 = Y0 - 0.385f * U - 0.581 * V;
-		dst.data[j + 1] = G0 < 0 ? 0 : (uint8_t)G0;
 
-		dst.data[j + 5] = (uint8_t)(Y1 + 1.140f * V);
-		dst.data[j + 3] = (uint8_t)(Y1 + 2.032f * U);
-		G1 = Y1 - 0.385f * U - 0.581 * V;
-		dst.data[j + 4] = G1 < 0 ? 0 : (uint8_t)G1;
+		R0 = Y0 + 1.140f * (V - 128.0f);
+		G0 = Y0 - 0.395f * (U - 128.0f) - 0.581f * (V - 128.0f);
+		B0 = Y0 + 2.032f * (U - 128.0f);
+
+		R1 = Y1 + 1.140f * (V - 128.0f);
+		G1 = Y1 - 0.395f * (U - 128.0f) - 0.581f * (V - 128.0f);
+		B1 = Y1 + 2.032f * (U - 128.0f);
+
+		dst.data[j + 2] = R0 > 255.0f ? 255 : R0 < 0.0f ? 0 : (uint8_t)R0;
+		dst.data[j + 1] = G0 > 255.0f ? 255 : G0 < 0.0f ? 0 : (uint8_t)G0;
+		dst.data[j]     = B0 > 255.0f ? 255 : B0 < 0.0f ? 0 : (uint8_t)B0;
+
+		dst.data[j + 5] = R1 > 255.0f ? 255 : R1 < 0.0f ? 0 : (uint8_t)R1;
+		dst.data[j + 4] = G1 > 255.0f ? 255 : G1 < 0.0f ? 0 : (uint8_t)G1;
+		dst.data[j + 3] = B1 > 255.0f ? 255 : B1 < 0.0f ? 0 : (uint8_t)B1;
 
 		j += 6;
+
 	}
 
 	return true;
 
-}//bool zs::PixelFormatConverter::YUY2_to_BGR24...
+}
 
 
 bool zs::PixelFormatConverter::YUY2_to_UYVY(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height * 2 ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
 	if (dst.data == nullptr || dst.size != src.size) {
+
 		delete[] dst.data;
 		dst.size = src.size;
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Copy atributes
 	dst.width = src.width;
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
 
-	// Convert
 	for (size_t i = 0; i < (size_t)src.size; i = i + 4) {
+
 		dst.data[i + 1] = src.data[i];
 		dst.data[i] = src.data[i + 1];
 		dst.data[i + 3] = src.data[i + 2];
 		dst.data[i + 2] = src.data[i + 3];
+
 	}
 
 	return true;
 
-}//bool zs::PixelFormatConverter::YUY2_to_UYVY...
+}
 
 
 bool zs::PixelFormatConverter::YUY2_to_Y800(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height * 2 ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
 	if (dst.data == nullptr || dst.size != src.width * src.height) {
+
 		delete[] dst.data;
 		dst.size = src.width * src.height;
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Convert
 	size_t j = 0;
 	for (size_t i = 0; i < (size_t)src.size; i = i + 2) {
+
 		dst.data[j] = src.data[i];
 		++j;
+
 	}
 
 	return true;
@@ -1106,184 +1120,181 @@ bool zs::PixelFormatConverter::YUY2_to_NV12(Frame& src, Frame& dst) {
 
 bool zs::PixelFormatConverter::Y800_to_RGB24(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
 	if (dst.data == nullptr || dst.size != src.width * src.height * 3) {
+
 		delete[] dst.data;
 		dst.size = src.width * src.height * 3;
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Copy atributes
 	dst.width = src.width;
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
 
-	// Conver data
 	size_t j = 0;
 	for (size_t i = 0; i < (size_t)src.size; ++i) {
+
 		dst.data[j] = src.data[i];
 		dst.data[j + 1] = src.data[i];
 		dst.data[j + 2] = src.data[i];
 		j = j + 3;
+
 	}
 
 	return true;
 
-}//bool zs::PixelFormatConverter::Y800_to_RGB24...
+}
 
 
 bool zs::PixelFormatConverter::Y800_to_BGR24(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
 	if (dst.data == nullptr || dst.size != src.width * src.height * 3) {
+
 		delete[] dst.data;
 		dst.size = src.width * src.height * 3;
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Copy atributes
 	dst.width = src.width;
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
 
-	// Conver data
 	size_t j = 0;
 	for (size_t i = 0; i < (size_t)src.size; ++i) {
+
 		dst.data[j] = src.data[i];
 		dst.data[j + 1] = src.data[i];
 		dst.data[j + 2] = src.data[i];
 		j = j + 3;
+
 	}
 
 	return true;
 
-}//bool zs::PixelFormatConverter::Y800_to_BGR24...
+}
 
 
 bool zs::PixelFormatConverter::Y800_to_UYVY(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
 	if (dst.data == nullptr || dst.size != src.width * src.height * 2) {
+
 		delete[] dst.data;
 		dst.size = src.width * src.height * 2;
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Copy atributes
 	dst.width = src.width;
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
 
-	// Conver data
 	size_t j = 0;
 	for (size_t i = 0; i < (size_t)src.size; i = i + 2) {
+
 		dst.data[j] = 0;
 		dst.data[j + 1] = src.data[i];
 		dst.data[j + 2] = 0;
 		dst.data[j + 3] = src.data[i + 1];
 		j = j + 4;
+
 	}
 
 	return true;
 
-}//bool zs::PixelFormatConverter::Y800_to_UYVY...
+}
 
 
 bool zs::PixelFormatConverter::Y800_to_YUY2(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
 	if (dst.data == nullptr || dst.size != src.width * src.height * 2) {
+
 		delete[] dst.data;
 		dst.size = src.width * src.height * 2;
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Copy atributes
 	dst.width = src.width;
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
 
-	// Conver data
 	size_t j = 0;
 	for (size_t i = 0; i < (size_t)src.size; i = i + 2) {
-		dst.data[j] = src.data[i];
+
 		dst.data[j + 1] = 0;
-		dst.data[j + 2] = src.data[i + 1];
+		dst.data[j] = src.data[i];
 		dst.data[j + 3] = 0;
+		dst.data[j + 2] = src.data[i + 1];
 		j = j + 4;
+
 	}
 
 	return true;
 
-}//bool zs::PixelFormatConverter::Y800_to_YUY2...
+}
 
 
 bool zs::PixelFormatConverter::Y800_to_NV12(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != src.width * src.height ||
 		src.width < MIN_FRAME_WIDTH ||
 		src.height < MIN_FRAME_HEIGHT)
 		return false;
 
-	// Check output frame
-	if (dst.data == nullptr || dst.size != (uint32_t)((float)(src.width * src.height) * 1.5f)) {
+	if (dst.data == nullptr || dst.size != src.width * (src.height + src.height / 2)) {
+
 		delete[] dst.data;
-		dst.size = (uint32_t)((float)(src.width * src.height) * 1.5f);
+		dst.size = src.width * (src.height + src.height / 2);
 		dst.data = new uint8_t[dst.size];
+
 	}
 
-	// Copy atributes
 	dst.width = src.width;
 	dst.height = src.height;
 	dst.sourceID = src.sourceID;
 	dst.frameID = src.frameID;
 
-	// Convert
 	memcpy(dst.data, src.data, (size_t)src.width * (size_t)src.height);
 	memset(&dst.data[src.width * src.height], 0, ((size_t)src.width * (size_t)src.height) / 2);
 
 	return true;
 
-}//bool zs::PixelFormatConverter::Y800_to_NV12...
+}
 
 
 bool zs::PixelFormatConverter::NV12_to_RGB24(Frame& src, Frame& dst) {
 
-	// Check input data
 	if (src.data == nullptr ||
 		src.size != (uint32_t)((float)(src.width * src.height) * 1.5f) ||
 		src.width < MIN_FRAME_WIDTH ||
