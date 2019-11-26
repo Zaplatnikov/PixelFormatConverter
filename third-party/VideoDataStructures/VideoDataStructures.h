@@ -20,6 +20,7 @@ namespace zs {
 		UYVY = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y'),
 		Y800 = MAKE_FOURCC_CODE('Y', '8', '0', '0'),
 		YUY2 = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2'),
+		YUV1 = MAKE_FOURCC_CODE('Y', 'U', 'V', '1'),
 		NV12 = MAKE_FOURCC_CODE('N', 'V', '1', '2'),
 		JPEG = MAKE_FOURCC_CODE('J', 'P', 'E', 'G'),
 		JPG2 = MAKE_FOURCC_CODE('J', 'P', 'G', '2'),

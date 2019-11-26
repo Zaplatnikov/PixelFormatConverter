@@ -734,6 +734,113 @@ namespace PixelFormatConverterUnitTests
 		};//TEST_METHOD...
 
 
+		TEST_METHOD(RGB24_to_YUV1) {
+
+			// Load image
+			cv::Mat bgrImage = cv::imread("test.jpg");
+			if (bgrImage.empty())
+				Assert::Fail(L"Test image not loaded");
+
+			// Convert image to rgb
+			cv::Mat rgbImage;
+			cv::cvtColor(bgrImage, rgbImage, cv::COLOR_BGR2RGB);
+
+			// Create RGB Frame object
+			zs::Frame rgbFrame;
+			rgbFrame.width = (uint32_t)rgbImage.size().width;
+			rgbFrame.height = (uint32_t)rgbImage.size().height;
+			rgbFrame.fourcc = MAKE_FOURCC_CODE('R', 'G', 'B', 'R');
+			rgbFrame.size = rgbFrame.width * rgbFrame.height * 3;
+			rgbFrame.sourceID = 1;
+			rgbFrame.frameID = 2;
+			rgbFrame.data = new uint8_t[rgbFrame.size];
+			memcpy(rgbFrame.data, rgbImage.data, rgbFrame.size);
+
+			// Convert image to YUV
+			cv::Mat yuvImage;
+			cv::cvtColor(rgbImage, yuvImage, cv::COLOR_RGB2YUV);
+
+			// Convert frame to YUV
+			zs::Frame yuvFrame;
+			yuvFrame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'V', '1');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(rgbFrame, yuvFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (rgbFrame.width != yuvFrame.width)
+				Assert::Fail(L"Width not equal");
+			if (rgbFrame.height != yuvFrame.height)
+				Assert::Fail(L"Height not equal");
+			if (rgbFrame.size != yuvFrame.size)
+				Assert::Fail(L"Size not valid");
+			if (rgbFrame.frameID != yuvFrame.frameID)
+				Assert::Fail(L"frameID not equal");
+			if (rgbFrame.sourceID != yuvFrame.sourceID)
+				Assert::Fail(L"SourceID not equal");
+
+			// Compare data
+			uint8_t val0, val1;
+			for (size_t i = 0; i < (size_t)yuvFrame.size; ++i) {
+				val0 = yuvFrame.data[i];
+				val1 = yuvImage.data[i];
+				if (abs((int)val0 - (int)val1) > 1) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...		
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(YUV1_to_RGB24) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create OpenCV YUV image
+			cv::Mat yuvImage = cv::Mat(cv::Size(width, height), CV_8UC3);
+			for (size_t i = 0; i < (size_t)width * (size_t)height * 3; ++i)
+				yuvImage.data[i] = (uint8_t)(rand() % 255);
+
+			// Create YUV frame
+			zs::Frame yuvFrame;
+			yuvFrame.width = width;
+			yuvFrame.height = height;
+			yuvFrame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'V', '1');
+			yuvFrame.size = yuvFrame.width * yuvFrame.height * 3;
+			yuvFrame.data = new uint8_t[yuvFrame.size];
+			memcpy(yuvFrame.data, yuvImage.data, yuvFrame.size);
+
+			// Convert image to RGB
+			cv::Mat rgbImage;
+			cv::cvtColor(yuvImage, rgbImage, cv::COLOR_YUV2RGB);
+
+			// Convert frame to RGB
+			zs::Frame rgbFrame;
+			rgbFrame.fourcc = MAKE_FOURCC_CODE('R', 'G', 'B', 'R');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(yuvFrame, rgbFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare data
+			uint8_t val0, val1;
+			for (size_t i = 0; i < (size_t)yuvFrame.size; ++i) {
+				val0 = rgbFrame.data[i];
+				val1 = rgbImage.data[i];
+				if (abs((int)val0 - (int)val1) > 5) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
 
 	};
 }

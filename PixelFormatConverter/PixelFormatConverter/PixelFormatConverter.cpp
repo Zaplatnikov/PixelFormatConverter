@@ -23,7 +23,6 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 	// Check input pixel format
 	switch (src.fourcc) {
 	case (uint32_t)ValidFourccCodes::RGB24:
-		// Check output pixel format
 		switch (dst.fourcc) {
 		case (uint32_t)ValidFourccCodes::RGB24:
 			return Copy(src, dst);
@@ -37,12 +36,13 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 			return RGB24_to_Y800(src, dst);
 		case (uint32_t)ValidFourccCodes::NV12:
 			return RGB24_to_NV12(src, dst);
+		case (uint32_t)ValidFourccCodes::YUV1:
+			return RGB24_to_YUV1(src, dst);
 		default:
 			return false;
 		}
 		break;
 	case (uint32_t)ValidFourccCodes::BGR24:
-		// Check output pixel format
 		switch (dst.fourcc) {
 		case (uint32_t)ValidFourccCodes::RGB24:
 			return BGR24_to_RGB24(src, dst);
@@ -61,7 +61,6 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 		}
 		break;
 	case (uint32_t)ValidFourccCodes::UYVY:
-		// Check output pixel format
 		switch (dst.fourcc) {
 		case (uint32_t)ValidFourccCodes::RGB24:
 			return UYVY_to_RGB24(src, dst);
@@ -80,7 +79,6 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 		}
 		break;
 	case (uint32_t)ValidFourccCodes::YUY2:
-		// Check output pixel format
 		switch (dst.fourcc) {
 		case (uint32_t)ValidFourccCodes::RGB24:
 			return YUY2_to_RGB24(src, dst);
@@ -99,7 +97,6 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 		}
 		break;
 	case (uint32_t)ValidFourccCodes::Y800:
-		// Check output pixel format
 		switch (dst.fourcc) {
 		case (uint32_t)ValidFourccCodes::RGB24:
 			return Y800_to_RGB24(src, dst);
@@ -118,7 +115,6 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 		}
 		break;
 	case (uint32_t)ValidFourccCodes::NV12:
-		// Check output pixel format
 		switch (dst.fourcc) {
 		case (uint32_t)ValidFourccCodes::RGB24:
 			return NV12_to_RGB24(src, dst);
@@ -132,6 +128,14 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 			return NV12_to_Y800(src, dst);
 		case (uint32_t)ValidFourccCodes::NV12:
 			return Copy(src, dst);
+		default:
+			return false;
+		}
+		break;
+	case (uint32_t)ValidFourccCodes::YUV1:
+		switch (dst.fourcc) {
+		case (uint32_t)ValidFourccCodes::RGB24:
+			return YUV1_to_RGB24(src, dst);
 		default:
 			return false;
 		}
@@ -1493,3 +1497,85 @@ bool zs::PixelFormatConverter::NV12_to_Y800(Frame& src, Frame& dst) {
 	return true;
 
 }//bool zs::PixelFormatConverter::NV12_to_Y800...
+
+
+bool zs::PixelFormatConverter::RGB24_to_YUV1(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 3 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.size) {
+		delete[] dst.data;
+		dst.size = src.size;
+		dst.data = new uint8_t[dst.size];
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	float R, G, B, Y, U, V;
+	for (size_t i = 0; i < (size_t)dst.size; i = i + 3) {
+		
+		R = (float)src.data[i];
+		G = (float)src.data[i + 1];
+		B = (float)src.data[i + 2];
+
+		Y = 0.299f * R + 0.587f * G + 0.114f * B;
+		U = 0.492f * (B - Y) + 128.0f;
+		V = 0.877f * (R - Y) + 128.0f;
+
+		dst.data[i]     = Y > 255.0f ? 255 : Y < 0.0f ? 0 : (uint8_t)Y;
+		dst.data[i + 1] = U > 255.0f ? 255 : U < 0.0f ? 0 : (uint8_t)U;
+		dst.data[i + 2] = V > 255.0f ? 255 : V < 0.0f ? 0 : (uint8_t)V;
+
+	}
+
+	return true;
+
+}
+
+
+bool zs::PixelFormatConverter::YUV1_to_RGB24(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 3 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.size) {
+		delete[] dst.data;
+		dst.size = src.size;
+		dst.data = new uint8_t[dst.size];
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	float R, G, B, Y, U, V;
+	for (size_t i = 0; i < (size_t)dst.size; i = i + 3) {
+
+		Y = (float)src.data[i];
+		U = (float)src.data[i + 1];
+		V = (float)src.data[i + 2];
+
+		R = Y + 1.140f * (V - 128.0f);
+		G = Y - 0.395f * (U - 128.0f) - 0.581f * (V - 128.0f);
+		B = Y + 2.032f * (U - 128.0f);
+
+		dst.data[i]     = R > 255.0f ? 255 : R < 0.0f ? 0 : (uint8_t)R;
+		dst.data[i + 1] = G > 255.0f ? 255 : G < 0.0f ? 0 : (uint8_t)G;
+		dst.data[i + 2] = B > 255.0f ? 255 : B < 0.0f ? 0 : (uint8_t)B;
+
+	}
+
+	return true;
+
+}

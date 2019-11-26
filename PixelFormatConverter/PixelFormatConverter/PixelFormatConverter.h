@@ -104,6 +104,10 @@ namespace zs {
 		bool NV12_to_YUY2(Frame& src, Frame& dst);
 		/// Method to convert NV12 to Y800
 		bool NV12_to_Y800(Frame& src, Frame& dst);
+		/// Method to convert RGB24 to YUV1
+		bool RGB24_to_YUV1(Frame& src, Frame& dst);
+		/// Method to convert YUV1 to RGB24
+		bool YUV1_to_RGB24(Frame& src, Frame& dst);
 
 	};//class...
 
