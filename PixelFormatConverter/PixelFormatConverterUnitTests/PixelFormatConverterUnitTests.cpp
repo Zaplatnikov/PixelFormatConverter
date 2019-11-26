@@ -736,31 +736,28 @@ namespace PixelFormatConverterUnitTests
 
 		TEST_METHOD(RGB24_to_YUV1) {
 
-			// Load image
-			cv::Mat bgrImage = cv::imread("test.jpg");
-			if (bgrImage.empty())
-				Assert::Fail(L"Test image not loaded");
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
 
-			// Convert image to rgb
-			cv::Mat rgbImage;
-			cv::cvtColor(bgrImage, rgbImage, cv::COLOR_BGR2RGB);
+			// Create OpenCV YUV image
+			cv::Mat rgbImage = cv::Mat(cv::Size(width, height), CV_8UC3);
+			for (size_t i = 0; i < (size_t)width * (size_t)height * 3; ++i)
+				rgbImage.data[i] = (uint8_t)(rand() % 255);
 
-			// Create RGB Frame object
+			// Create YUV frame
 			zs::Frame rgbFrame;
-			rgbFrame.width = (uint32_t)rgbImage.size().width;
-			rgbFrame.height = (uint32_t)rgbImage.size().height;
+			rgbFrame.width = width;
+			rgbFrame.height = height;
 			rgbFrame.fourcc = MAKE_FOURCC_CODE('R', 'G', 'B', 'R');
 			rgbFrame.size = rgbFrame.width * rgbFrame.height * 3;
-			rgbFrame.sourceID = 1;
-			rgbFrame.frameID = 2;
 			rgbFrame.data = new uint8_t[rgbFrame.size];
 			memcpy(rgbFrame.data, rgbImage.data, rgbFrame.size);
 
-			// Convert image to YUV
+			// Convert image to YUV1
 			cv::Mat yuvImage;
 			cv::cvtColor(rgbImage, yuvImage, cv::COLOR_RGB2YUV);
 
-			// Convert frame to YUV
+			// Convert frame to YUV1
 			zs::Frame yuvFrame;
 			yuvFrame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'V', '1');
 			zs::PixelFormatConverter converter;
@@ -768,18 +765,6 @@ namespace PixelFormatConverterUnitTests
 				Assert::Fail(L"Convert function returned FALSE");
 				return;
 			}//if...
-
-			// Compare atributes
-			if (rgbFrame.width != yuvFrame.width)
-				Assert::Fail(L"Width not equal");
-			if (rgbFrame.height != yuvFrame.height)
-				Assert::Fail(L"Height not equal");
-			if (rgbFrame.size != yuvFrame.size)
-				Assert::Fail(L"Size not valid");
-			if (rgbFrame.frameID != yuvFrame.frameID)
-				Assert::Fail(L"frameID not equal");
-			if (rgbFrame.sourceID != yuvFrame.sourceID)
-				Assert::Fail(L"SourceID not equal");
 
 			// Compare data
 			uint8_t val0, val1;
@@ -832,7 +817,7 @@ namespace PixelFormatConverterUnitTests
 			for (size_t i = 0; i < (size_t)yuvFrame.size; ++i) {
 				val0 = rgbFrame.data[i];
 				val1 = rgbImage.data[i];
-				if (abs((int)val0 - (int)val1) > 5) {
+				if (abs((int)val0 - (int)val1) > 1) {
 					Assert::Fail(L"Data not equal");
 					return;
 				}//if...
