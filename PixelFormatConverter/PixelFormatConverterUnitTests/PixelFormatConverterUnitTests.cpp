@@ -595,6 +595,61 @@ namespace PixelFormatConverterUnitTests
 		};//TEST_METHOD...
 
 
+		TEST_METHOD(BGR24_to_NV12) {
+
+			// Load image
+			cv::Mat bgrImage = cv::imread("test.jpg");
+			if (bgrImage.empty())
+				Assert::Fail(L"Test image not loaded");
+
+			// Create src Frame object
+			zs::Frame bgrFrame;
+			bgrFrame.width = (uint32_t)bgrImage.size().width;
+			bgrFrame.height = (uint32_t)bgrImage.size().height;
+			bgrFrame.fourcc = MAKE_FOURCC_CODE('B', 'G', 'R', 'B');
+			bgrFrame.size = bgrFrame.width * bgrFrame.height * 3;
+			bgrFrame.sourceID = 1;
+			bgrFrame.frameID = 2;
+			bgrFrame.data = new uint8_t[bgrFrame.size];
+
+			// Copy RGB data
+			memcpy(bgrFrame.data, bgrImage.data, bgrFrame.size);
+
+			// Convert to NV12
+			cv::Mat yuvImage;
+			cv::cvtColor(bgrImage, yuvImage, cv::COLOR_BGR2YUV);
+
+			// Convert to NV12
+			zs::Frame nv12Frame;
+			nv12Frame.fourcc = MAKE_FOURCC_CODE('N', 'V', '1', '2');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(bgrFrame, nv12Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+			}//if...
+
+			// Compare atributes
+			if (bgrFrame.width != nv12Frame.width)
+				Assert::Fail(L"Width not equal");
+			if (bgrFrame.height != nv12Frame.height)
+				Assert::Fail(L"Height not equal");
+			if (bgrFrame.size == nv12Frame.size)
+				Assert::Fail(L"Size not valid");
+			if (bgrFrame.frameID != nv12Frame.frameID)
+				Assert::Fail(L"frameID not equal");
+			if (bgrFrame.sourceID != nv12Frame.sourceID)
+				Assert::Fail(L"SourceID not equal");
+
+			// Compare Y data
+			for (size_t i = 0; i < (size_t)nv12Frame.width * (size_t)nv12Frame.height; ++i) {
+				if (abs((int)yuvImage.data[i * 3] - (int)nv12Frame.data[i]) > 1) {
+					Assert::Fail(L"Y data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
 
 	};
 }
