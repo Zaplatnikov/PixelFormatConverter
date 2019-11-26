@@ -482,6 +482,66 @@ namespace PixelFormatConverterUnitTests
 		};//TEST_METHOD...
 
 
+		TEST_METHOD(BGR24_to_YUY2) {
+
+			// Load image
+			cv::Mat bgrImage = cv::imread("test.jpg");
+			if (bgrImage.empty())
+				Assert::Fail(L"Test image not loaded");
+
+			// Create src Frame object
+			zs::Frame bgrFrame;
+			bgrFrame.width = (uint32_t)bgrImage.size().width;
+			bgrFrame.height = (uint32_t)bgrImage.size().height;
+			bgrFrame.fourcc = MAKE_FOURCC_CODE('B', 'G', 'R', 'B');
+			bgrFrame.size = bgrFrame.width * bgrFrame.height * 3;
+			bgrFrame.sourceID = 1;
+			bgrFrame.frameID = 2;
+			bgrFrame.data = new uint8_t[bgrFrame.size];
+
+			// Copy data
+			memcpy(bgrFrame.data, bgrImage.data, bgrFrame.size);
+
+			// Convert to UYVY
+			zs::Frame yuy2Frame;
+			yuy2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(bgrFrame, yuy2Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+			}//if...
+
+			// Compare
+			cv::Mat yuvImage;
+			cv::cvtColor(bgrImage, yuvImage, cv::COLOR_BGR2YUV);
+
+
+			// Compare atributes
+			if (bgrFrame.width != yuy2Frame.width)
+				Assert::Fail(L"Width not equal");
+			if (bgrFrame.height != yuy2Frame.height)
+				Assert::Fail(L"Height not equal");
+			if (bgrFrame.size == yuy2Frame.size)
+				Assert::Fail(L"Size not valid");
+			if (bgrFrame.frameID != yuy2Frame.frameID)
+				Assert::Fail(L"frameID not equal");
+			if (bgrFrame.sourceID != yuy2Frame.sourceID)
+				Assert::Fail(L"SourceID not equal");
+
+			// Compare data
+			int j = 0;
+			for (int i = 0; i < yuvImage.size().width * yuvImage.size().height * 3; i = i + 6) {
+				if (abs((int)yuy2Frame.data[j] - (int)yuvImage.data[i]) > 5) {
+					Assert::Fail(L"Y data not equal");
+				}//if...
+				if (abs((int)yuy2Frame.data[j + 2] - (int)yuvImage.data[i + 3]) > 5) {
+					Assert::Fail(L"Y data not equal");
+				}//if...
+				j = j + 4;
+			}//for...
+
+		};//TEST_METHOD...
+
+
 
 	};
 }

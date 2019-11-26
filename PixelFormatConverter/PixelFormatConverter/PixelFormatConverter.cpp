@@ -530,7 +530,7 @@ bool zs::PixelFormatConverter::BGR24_to_YUY2(Frame& src, Frame& dst) {
 	float R0, G0, B0, R1, G1, B1;
 	size_t j = 0;
 	for (size_t i = 0; i < (size_t)src.size; i = i + 6) {
-		R0 = (float)src.data[i + 3];
+		R0 = (float)src.data[i + 2];
 		G0 = (float)src.data[i + 1];
 		B0 = (float)src.data[i];
 		R1 = (float)src.data[i + 5];
