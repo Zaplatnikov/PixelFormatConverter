@@ -20,6 +20,9 @@ zs::PixelFormatConverter::~PixelFormatConverter() {
 
 bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 
+	if (src.height % 2 != 0)
+		return false;
+
 	switch (src.fourcc) {
 
 	case (uint32_t)ValidFourccCodes::RGB24:
@@ -1918,20 +1921,123 @@ bool zs::PixelFormatConverter::YUV1_to_NV12(Frame& src, Frame& dst) {
 
 bool zs::PixelFormatConverter::YUY2_to_YUV1(Frame& src, Frame& dst) {
 
-	return false;
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 2 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.width * src.height * 3) {
+
+		delete[] dst.data;
+		dst.size = src.width * src.height * 3;
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	size_t p = 0;
+	for (size_t i = 0; i < (size_t)dst.size; i = i + 6) {
+		dst.data[i] = src.data[p];
+		dst.data[i + 1] = src.data[p + 1];
+		dst.data[i + 2] = src.data[p + 3];
+		dst.data[i + 3] = src.data[p + 2];
+		dst.data[i + 4] = src.data[p + 1];
+		dst.data[i + 5] = src.data[p + 3];
+		p = p + 4;
+	}//for...
+
+	return true;
 
 }
 
 
 bool zs::PixelFormatConverter::Y800_to_YUV1(Frame& src, Frame& dst) {
 
-	return false;
+	if (src.data == nullptr ||
+		src.size != src.width * src.height ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.width * src.height * 3) {
+
+		delete[] dst.data;
+		dst.size = src.width * src.height * 3;
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	size_t p = 0;
+	for (size_t i = 0; i < (size_t)dst.size; i = i + 3) {
+
+		dst.data[i]     = src.data[p];
+		dst.data[i + 1] = 0;
+		dst.data[i + 2] = 0;
+		++p;
+
+	}
+
+	return true;
 
 }
 
 
 bool zs::PixelFormatConverter::NV12_to_YUV1(Frame& src, Frame& dst) {
 
-	return false;
+	if (src.data == nullptr ||
+		src.size != src.width * (src.height + src.height / 2) ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.width * src.height * 3) {
+
+		delete[] dst.data;
+		dst.size = src.width * src.height * 3;
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	size_t p = dst.height;
+	for (size_t i = 0; i < src.height; i = i + 2) {
+		for (size_t j = 0; j < src.width; j = j + 2) {
+			
+			dst.data[i * dst.width * 3 + j * 3] = src.data[i * src.width + j];
+			dst.data[i * dst.width * 3 + j * 3 + 3] = src.data[i * src.width + j + 1];
+			dst.data[(i + 1) * dst.width * 3 + j * 3] = src.data[(i + 1) * src.width + j];
+			dst.data[(i + 1) * dst.width * 3 + j * 3 + 3] = src.data[(i + 1) * src.width + j + 1];
+			
+			dst.data[i * dst.width * 3 + j * 3 + 1] = src.data[p * src.width + j];
+			dst.data[i * dst.width * 3 + j * 3 + 2] = src.data[p * src.width + j + 1];
+
+			dst.data[i * dst.width * 3 + j * 3 + 4] = src.data[p * src.width + j];
+			dst.data[i * dst.width * 3 + j * 3 + 5] = src.data[p * src.width + j + 1];
+
+			dst.data[(i + 1) * dst.width * 3 + j * 3 + 1] = src.data[p * src.width + j];
+			dst.data[(i + 1) * dst.width * 3 + j * 3 + 2] = src.data[p * src.width + j + 1];
+
+			dst.data[(i + 1) * dst.width * 3 + j * 3 + 4] = src.data[p * src.width + j];
+			dst.data[(i + 1) * dst.width * 3 + j * 3 + 5] = src.data[p * src.width + j + 1];
+
+		}
+		++p;
+	}
+
+	return true;
 
 }

@@ -1245,7 +1245,7 @@ namespace PixelFormatConverterUnitTests
 				++p;
 			}//for...
 
-		};
+		};//TEST_METHOD...
 
 
 	};
