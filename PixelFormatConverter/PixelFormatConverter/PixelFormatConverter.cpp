@@ -57,6 +57,8 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 			return BGR24_to_Y800(src, dst);
 		case (uint32_t)ValidFourccCodes::NV12:
 			return BGR24_to_NV12(src, dst);
+		case (uint32_t)ValidFourccCodes::YUV1:
+			return BGR24_to_YUV1(src, dst);
 		default:
 			return false;
 		}
@@ -76,6 +78,8 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 			return UYVY_to_Y800(src, dst);
 		case (uint32_t)ValidFourccCodes::NV12:
 			return UYVY_to_NV12(src, dst);
+		case (uint32_t)ValidFourccCodes::YUV1:
+			return UYVY_to_YUV1(src, dst);
 		default:
 			return false;
 		}
@@ -95,6 +99,8 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 			return YUY2_to_Y800(src, dst);
 		case (uint32_t)ValidFourccCodes::NV12:
 			return YUY2_to_NV12(src, dst);
+		case (uint32_t)ValidFourccCodes::YUV1:
+			return YUY2_to_YUV1(src, dst);
 		default:
 			return false;
 		}
@@ -114,6 +120,8 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 			return Copy(src, dst);
 		case (uint32_t)ValidFourccCodes::NV12:
 			return Y800_to_NV12(src, dst);
+		case (uint32_t)ValidFourccCodes::YUV1:
+			return Y800_to_YUV1(src, dst);
 		default:
 			return false;
 		}
@@ -133,6 +141,8 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 			return NV12_to_Y800(src, dst);
 		case (uint32_t)ValidFourccCodes::NV12:
 			return Copy(src, dst);
+		case (uint32_t)ValidFourccCodes::YUV1:
+			return NV12_to_YUV1(src, dst);
 		default:
 			return false;
 		}
@@ -142,6 +152,18 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 		switch (dst.fourcc) {
 		case (uint32_t)ValidFourccCodes::RGB24:
 			return YUV1_to_RGB24(src, dst);
+		case (uint32_t)ValidFourccCodes::BGR24:
+			return YUV1_to_BGR24(src, dst);
+		case (uint32_t)ValidFourccCodes::UYVY:
+			return YUV1_to_UYVY(src, dst);
+		case (uint32_t)ValidFourccCodes::YUY2:
+			return YUV1_to_YUY2(src, dst);
+		case (uint32_t)ValidFourccCodes::Y800:
+			return YUV1_to_Y800(src, dst);
+		case (uint32_t)ValidFourccCodes::NV12:
+			return YUV1_to_NV12(src, dst);
+		case (uint32_t)ValidFourccCodes::YUV1:
+			return Copy(src, dst);
 		default:
 			return false;
 		}
@@ -1621,5 +1643,295 @@ bool zs::PixelFormatConverter::YUV1_to_RGB24(Frame& src, Frame& dst) {
 	}
 
 	return true;
+
+}
+
+
+bool zs::PixelFormatConverter::BGR24_to_YUV1(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 3 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.size) {
+
+		delete[] dst.data;
+		dst.size = src.size;
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	float R, G, B, Y, U, V;
+	for (size_t i = 0; i < (size_t)dst.size; i = i + 3) {
+
+		B = (float)src.data[i];
+		G = (float)src.data[i + 1];
+		R = (float)src.data[i + 2];
+
+		Y = 0.299f * R + 0.587f * G + 0.114f * B;
+		U = 0.492f * (B - Y) + 128.0f;
+		V = 0.877f * (R - Y) + 128.0f;
+
+		dst.data[i] = Y > 255.0f ? 255 : Y < 0.0f ? 0 : (uint8_t)Y;
+		dst.data[i + 1] = U > 255.0f ? 255 : U < 0.0f ? 0 : (uint8_t)U;
+		dst.data[i + 2] = V > 255.0f ? 255 : V < 0.0f ? 0 : (uint8_t)V;
+
+	}
+
+	return true;
+
+}
+
+
+bool zs::PixelFormatConverter::UYVY_to_YUV1(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 2 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.width * src.height * 3) {
+
+		delete[] dst.data;
+		dst.size = src.width * src.height * 3;
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	size_t p = 0;
+	for (size_t i = 0; i < (size_t)dst.size; i = i + 6) {
+		dst.data[i] = src.data[p + 1];
+		dst.data[i + 1] = src.data[p];
+		dst.data[i + 2] = src.data[p + 2];
+		dst.data[i + 3] = src.data[p + 3];
+		dst.data[i + 4] = src.data[p];
+		dst.data[i + 5] = src.data[p + 2];
+		p = p + 4;
+	}//for...
+
+	return false;
+}
+
+
+bool zs::PixelFormatConverter::YUV1_to_BGR24(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 3 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.size) {
+		delete[] dst.data;
+		dst.size = src.size;
+		dst.data = new uint8_t[dst.size];
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	float R, G, B, Y, U, V;
+	for (size_t i = 0; i < (size_t)dst.size; i = i + 3) {
+
+		Y = (float)src.data[i];
+		U = (float)src.data[i + 1];
+		V = (float)src.data[i + 2];
+
+		R = Y + 1.140f * (V - 128.0f);
+		G = Y - 0.395f * (U - 128.0f) - 0.581f * (V - 128.0f);
+		B = Y + 2.032f * (U - 128.0f);
+
+		dst.data[i + 2] = R > 255.0f ? 255 : R < 0.0f ? 0 : (uint8_t)R;
+		dst.data[i + 1] = G > 255.0f ? 255 : G < 0.0f ? 0 : (uint8_t)G;
+		dst.data[i] = B > 255.0f ? 255 : B < 0.0f ? 0 : (uint8_t)B;
+
+	}
+
+	return true;
+
+}
+
+
+bool zs::PixelFormatConverter::YUV1_to_UYVY(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 3 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.width * src.height * 2) {
+
+		delete[] dst.data;
+		dst.size = src.width * src.height * 2;
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	size_t p = 0;
+	for (size_t i = 0; i < (size_t)src.size; i = i + 6) {
+
+		dst.data[p + 1] = src.data[i];
+		dst.data[p] = src.data[i + 1];
+		dst.data[p + 2] = src.data[i + 2];
+		dst.data[p + 3] = src.data[i + 3];
+		p = p + 4;
+
+	}
+
+	return true;
+
+}
+
+
+bool zs::PixelFormatConverter::YUV1_to_YUY2(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 3 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.width * src.height * 2) {
+
+		delete[] dst.data;
+		dst.size = src.width * src.height * 2;
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	size_t p = 0;
+	for (size_t i = 0; i < (size_t)src.size; i = i + 6) {
+
+		dst.data[p] = src.data[i];
+		dst.data[p + 1] = src.data[i + 1];
+		dst.data[p + 3] = src.data[i + 2];
+		dst.data[p + 2] = src.data[i + 3];
+		p = p + 4;
+
+	}
+
+	return true;
+
+}
+
+
+bool zs::PixelFormatConverter::YUV1_to_Y800(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 3 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.width * src.height) {
+
+		delete[] dst.data;
+		dst.size = src.width * src.height;
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	size_t p = 0;
+	for (size_t i = 0; i < (size_t)src.size; i = i + 3) {
+
+		dst.data[p] = src.data[i];
+		++p;
+
+	}
+
+	return true;
+
+}
+
+
+bool zs::PixelFormatConverter::YUV1_to_NV12(Frame& src, Frame& dst) {
+
+	if (src.data == nullptr ||
+		src.size != src.width * src.height * 3 ||
+		src.width < MIN_FRAME_WIDTH ||
+		src.height < MIN_FRAME_HEIGHT)
+		return false;
+
+	if (dst.data == nullptr || dst.size != src.width * (src.height + src.height / 2)) {
+
+		delete[] dst.data;
+		dst.size = src.width * (src.height + src.height / 2);
+		dst.data = new uint8_t[dst.size];
+
+	}
+
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
+	size_t p = src.height;
+	for (size_t i = 0; i < (size_t)src.height; i = i + 2) {
+		for (size_t j = 0; j < (size_t)src.width; j = j + 2) {
+
+			dst.data[i * (size_t)src.width + j] = src.data[i * (size_t)src.width * 3 + j * 3];
+			dst.data[i * (size_t)src.width + j + 1] = src.data[i * (size_t)src.width * 3 + j * 3 + 3];
+			dst.data[(i + 1) * (size_t)src.width + j] = src.data[(i + 1) * (size_t)src.width * 3 + j * 3];
+			dst.data[(i + 1) * (size_t)src.width + j + 1] = src.data[(i + 1) * (size_t)src.width * 3 + j * 3 + 3];
+			dst.data[p * src.width + j] = src.data[i * (size_t)src.width * 3 + j * 3 + 1];
+			dst.data[p * src.width + j + 1] = src.data[i * (size_t)src.width * 3 + j * 3 + 2];
+
+		}
+		++p;
+	}
+
+	return true;
+
+}
+
+
+bool zs::PixelFormatConverter::YUY2_to_YUV1(Frame& src, Frame& dst) {
+
+	return false;
+
+}
+
+
+bool zs::PixelFormatConverter::Y800_to_YUV1(Frame& src, Frame& dst) {
+
+	return false;
+
+}
+
+
+bool zs::PixelFormatConverter::NV12_to_YUV1(Frame& src, Frame& dst) {
+
+	return false;
 
 }

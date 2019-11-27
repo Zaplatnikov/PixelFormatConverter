@@ -54,6 +54,8 @@ namespace zs {
 		bool RGB24_to_Y800(Frame& src, Frame& dst);
 		/// Method to convert RGB24 to NV12
 		bool RGB24_to_NV12(Frame& src, Frame& dst);
+		/// Method to convert RGB24 to YUV1
+		bool RGB24_to_YUV1(Frame& src, Frame& dst);
 		/// Method to convert BGR24 to RGB24
 		bool BGR24_to_RGB24(Frame& src, Frame& dst);
 		/// Method to convert BGR24 to UYVY
@@ -64,6 +66,8 @@ namespace zs {
 		bool BGR24_to_Y800(Frame& src, Frame& dst);
 		/// Method to convert BGR24 to NV12
 		bool BGR24_to_NV12(Frame& src, Frame& dst);
+		/// Method to convert RGB24 to YUV1
+		bool BGR24_to_YUV1(Frame& src, Frame& dst);
 		/// Method to convert UYVY to RGB24
 		bool UYVY_to_RGB24(Frame& src, Frame& dst);
 		/// Method to convert UYVY to BGR24
@@ -74,6 +78,8 @@ namespace zs {
 		bool UYVY_to_Y800(Frame& src, Frame& dst);
 		/// Method to convert UYVY to NV12
 		bool UYVY_to_NV12(Frame& src, Frame& dst);
+		/// Method to convert UYVY to YUV1
+		bool UYVY_to_YUV1(Frame& src, Frame& dst);
 		/// Method to convert YUY2 to RGB24
 		bool YUY2_to_RGB24(Frame& src, Frame& dst);
 		/// Method to convert YUY2 to BGR24
@@ -98,16 +104,30 @@ namespace zs {
 		bool NV12_to_RGB24(Frame& src, Frame& dst);
 		/// Method to convert NV12 to BGR24
 		bool NV12_to_BGR24(Frame& src, Frame& dst);
-		/// Method to convert NV12 to BGR24
+		/// Method to convert NV12 to UYVY
 		bool NV12_to_UYVY(Frame& src, Frame& dst);
 		/// Method to convert NV12 to BGR24
 		bool NV12_to_YUY2(Frame& src, Frame& dst);
 		/// Method to convert NV12 to Y800
 		bool NV12_to_Y800(Frame& src, Frame& dst);
-		/// Method to convert RGB24 to YUV1
-		bool RGB24_to_YUV1(Frame& src, Frame& dst);
 		/// Method to convert YUV1 to RGB24
 		bool YUV1_to_RGB24(Frame& src, Frame& dst);
+		/// Method to convert YUV1 to BGR24
+		bool YUV1_to_BGR24(Frame& src, Frame& dst);
+		/// Method to convert YUV1 to UYVY
+		bool YUV1_to_UYVY(Frame& src, Frame& dst);
+		/// Method to convert YUV1 to YUY2
+		bool YUV1_to_YUY2(Frame& src, Frame& dst);
+		/// Method to convert YUV1 to Y800
+		bool YUV1_to_Y800(Frame& src, Frame& dst);
+		/// Method to convert YUV1 to NV12
+		bool YUV1_to_NV12(Frame& src, Frame& dst);
+		/// Method to convert YUV2 to YUV1
+		bool YUY2_to_YUV1(Frame& src, Frame& dst);
+		/// Method to convert Y800 to YUV1
+		bool Y800_to_YUV1(Frame& src, Frame& dst);
+		/// Method to convert NV12 to YUV1
+		bool NV12_to_YUV1(Frame& src, Frame& dst);
 
 	};//class...
 
