@@ -1089,6 +1089,11 @@ bool zs::PixelFormatConverter::YUY2_to_Y800(Frame& src, Frame& dst) {
 
 	}
 
+	dst.width = src.width;
+	dst.height = src.height;
+	dst.sourceID = src.sourceID;
+	dst.frameID = src.frameID;
+
 	size_t j = 0;
 	for (size_t i = 0; i < (size_t)src.size; i = i + 2) {
 
@@ -1723,9 +1728,10 @@ bool zs::PixelFormatConverter::UYVY_to_YUV1(Frame& src, Frame& dst) {
 		dst.data[i + 4] = src.data[p];
 		dst.data[i + 5] = src.data[p + 2];
 		p = p + 4;
-	}//for...
+	}
 
-	return false;
+	return true;
+
 }
 
 

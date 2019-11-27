@@ -1248,5 +1248,816 @@ namespace PixelFormatConverterUnitTests
 		};//TEST_METHOD...
 
 
+		TEST_METHOD(UYVY_to_BGR24) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create source BGR image
+			zs::Frame sourceBGRFrame;
+			sourceBGRFrame.width = width;
+			sourceBGRFrame.height = height;
+			sourceBGRFrame.fourcc = MAKE_FOURCC_CODE('B', 'G', 'R', 'B');
+			sourceBGRFrame.size = sourceBGRFrame.width * sourceBGRFrame.height * 3;
+			sourceBGRFrame.sourceID = 1;
+			sourceBGRFrame.frameID = 2;
+			sourceBGRFrame.data = new uint8_t[sourceBGRFrame.size];
+
+			// Convert source RGB to UYVY
+			zs::Frame uyvyFrame;
+			uyvyFrame.fourcc = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(sourceBGRFrame, uyvyFrame)) {
+				Assert::Fail(L"Convert function RGB_to_UYVY returned FALSE");
+				return;
+			}//if...
+
+			// Convert UYVY to RGB
+			zs::Frame resultBGRFrame;
+			resultBGRFrame.fourcc = MAKE_FOURCC_CODE('B', 'G', 'R', 'B');
+			if (!converter.Convert(uyvyFrame, resultBGRFrame)) {
+				Assert::Fail(L"Convert function UYVY_to_BGR returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (sourceBGRFrame.width != resultBGRFrame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (sourceBGRFrame.height != resultBGRFrame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (sourceBGRFrame.size != resultBGRFrame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (sourceBGRFrame.frameID != resultBGRFrame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (sourceBGRFrame.sourceID != resultBGRFrame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)resultBGRFrame.size; i = i + 6) {
+				if (abs((int)sourceBGRFrame.data[i] - (int)resultBGRFrame.data[i]) > 1) {
+					Assert::Fail(L"R data not equal");
+					return;
+				}//if...
+				if (abs((int)sourceBGRFrame.data[i + 1] - (int)resultBGRFrame.data[i + 1]) > 1) {
+					Assert::Fail(L"G data not equal");
+					return;
+				}//if...
+				if (abs((int)sourceBGRFrame.data[i + 2] - (int)resultBGRFrame.data[i + 2]) > 1) {
+					Assert::Fail(L"B data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(UYVY_to_YUY2) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create YUY2 frame
+			zs::Frame yuy2Frame;
+			yuy2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			yuy2Frame.width = width;
+			yuy2Frame.height = height;
+			yuy2Frame.frameID = 2;
+			yuy2Frame.sourceID = 1;
+			yuy2Frame.size = yuy2Frame.width * yuy2Frame.height * 2;
+			yuy2Frame.data = new uint8_t[yuy2Frame.size];
+			for (size_t i = 0; i < (size_t)yuy2Frame.size; ++i)
+				yuy2Frame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert frame to UYVY
+			zs::Frame uyvyFrame;
+			uyvyFrame.fourcc = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(yuy2Frame, uyvyFrame)) {
+				Assert::Fail(L"Convert function UYVY_to_BGR returned FALSE");
+				return;
+			}//if...
+
+			// Convert frame to YUY2
+			zs::Frame resultYUY2Frame;
+			resultYUY2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			if (!converter.Convert(uyvyFrame, resultYUY2Frame)) {
+				Assert::Fail(L"Convert function UYVY_to_BGR returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (yuy2Frame.width != resultYUY2Frame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (yuy2Frame.height != resultYUY2Frame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (yuy2Frame.size != resultYUY2Frame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (yuy2Frame.frameID != resultYUY2Frame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (yuy2Frame.sourceID != resultYUY2Frame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)yuy2Frame.size; ++i) {
+				if (yuy2Frame.data[i] != resultYUY2Frame.data[i]) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(UYVY_to_Y800) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create GRAY frame
+			zs::Frame grayFrame;
+			grayFrame.fourcc = MAKE_FOURCC_CODE('Y', '8', '0', '0');
+			grayFrame.width = width;
+			grayFrame.height = height;
+			grayFrame.frameID = 2;
+			grayFrame.sourceID = 1;
+			grayFrame.size = grayFrame.width * grayFrame.height;
+			grayFrame.data = new uint8_t[grayFrame.size];
+			for (size_t i = 0; i < (size_t)grayFrame.size; ++i)
+				grayFrame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert frame to UYVY
+			zs::Frame uyvyFrame;
+			uyvyFrame.fourcc = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(grayFrame, uyvyFrame)) {
+				Assert::Fail(L"Convert function UYVY_to_BGR returned FALSE");
+				return;
+			}//if...
+
+			// Convert frame to Y800
+			zs::Frame resultGrayFrame;
+			resultGrayFrame.fourcc = MAKE_FOURCC_CODE('Y', '8', '0', '0');
+			if (!converter.Convert(uyvyFrame, resultGrayFrame)) {
+				Assert::Fail(L"Convert function UYVY_to_BGR returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (grayFrame.width != resultGrayFrame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (grayFrame.height != resultGrayFrame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (grayFrame.size != resultGrayFrame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (grayFrame.frameID != resultGrayFrame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (grayFrame.sourceID != resultGrayFrame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)grayFrame.size; ++i) {
+				if (grayFrame.data[i] != resultGrayFrame.data[i]) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(UYVY_to_NV12) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create NV12 frame
+			zs::Frame nv12Frame;
+			nv12Frame.fourcc = MAKE_FOURCC_CODE('N', 'V', '1', '2');
+			nv12Frame.width = width;
+			nv12Frame.height = height;
+			nv12Frame.frameID = 2;
+			nv12Frame.sourceID = 1;
+			nv12Frame.size = nv12Frame.width * (nv12Frame.height + nv12Frame.height / 2);
+			nv12Frame.data = new uint8_t[nv12Frame.size];
+			for (size_t i = 0; i < (size_t)nv12Frame.size; ++i)
+				nv12Frame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert frame to UYVY
+			zs::Frame uyvyFrame;
+			uyvyFrame.fourcc = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(nv12Frame, uyvyFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Convert frame to NV12
+			zs::Frame resultNV12Frame;
+			resultNV12Frame.fourcc = MAKE_FOURCC_CODE('N', 'V', '1', '2');
+			if (!converter.Convert(uyvyFrame, resultNV12Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (nv12Frame.width != resultNV12Frame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (nv12Frame.height != resultNV12Frame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (nv12Frame.size != resultNV12Frame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (nv12Frame.frameID != resultNV12Frame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (nv12Frame.sourceID != resultNV12Frame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)nv12Frame.size; ++i) {
+				if (nv12Frame.data[i] != resultNV12Frame.data[i]) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(UYVY_to_YUV1) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create YUV1 frame
+			zs::Frame yuv1Frame;
+			yuv1Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'V', '1');
+			yuv1Frame.width = width;
+			yuv1Frame.height = height;
+			yuv1Frame.frameID = 2;
+			yuv1Frame.sourceID = 1;
+			yuv1Frame.size = yuv1Frame.width * yuv1Frame.height * 3;
+			yuv1Frame.data = new uint8_t[yuv1Frame.size];
+			for (size_t i = 0; i < (size_t)yuv1Frame.size; ++i)
+				yuv1Frame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert frame to UYVY
+			zs::Frame uyvyFrame;
+			uyvyFrame.fourcc = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(yuv1Frame, uyvyFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Convert frame to YUV1
+			zs::Frame resultYUV1Frame;
+			resultYUV1Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'V', '1');
+			if (!converter.Convert(uyvyFrame, resultYUV1Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (yuv1Frame.width != resultYUV1Frame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (yuv1Frame.height != resultYUV1Frame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (yuv1Frame.size != resultYUV1Frame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (yuv1Frame.frameID != resultYUV1Frame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (yuv1Frame.sourceID != resultYUV1Frame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)resultYUV1Frame.height; i = i + 2) {
+				for (size_t j = 0; j < (size_t)resultYUV1Frame.width; j = j + 2) {
+					if (resultYUV1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3] !=
+						yuv1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3]) {
+						Assert::Fail(L"Y00 Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 3] !=
+						yuv1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 3]) {
+						Assert::Fail(L"Y01 Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[(i + 1) * (size_t)resultYUV1Frame.width * 3 + j * 3] !=
+						yuv1Frame.data[(i + 1) * (size_t)resultYUV1Frame.width * 3 + j * 3]) {
+						Assert::Fail(L"Y10 Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[(i + 1) * (size_t)resultYUV1Frame.width * 3 + j * 3 + 3] !=
+						yuv1Frame.data[(i + 1) * (size_t)resultYUV1Frame.width * 3 + j * 3 + 3]) {
+						Assert::Fail(L"Y11 Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 1] !=
+						yuv1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 1]) {
+						Assert::Fail(L"U Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 2] !=
+						yuv1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 2]) {
+						Assert::Fail(L"Y Data not equal");
+						return;
+					}//if...
+				}//for...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(YUY2_to_RGB24) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create source RGB image
+			zs::Frame sourceRGBFrame;
+			sourceRGBFrame.width = width;
+			sourceRGBFrame.height = height;
+			sourceRGBFrame.fourcc = MAKE_FOURCC_CODE('R', 'G', 'B', 'R');
+			sourceRGBFrame.size = sourceRGBFrame.width * sourceRGBFrame.height * 3;
+			sourceRGBFrame.sourceID = 1;
+			sourceRGBFrame.frameID = 2;
+			sourceRGBFrame.data = new uint8_t[sourceRGBFrame.size];
+
+			// Convert source RGB to UYVY
+			zs::Frame yuy2Frame;
+			yuy2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(sourceRGBFrame, yuy2Frame)) {
+				Assert::Fail(L"Convert function RGB_to_UYVY returned FALSE");
+				return;
+			}//if...
+
+			// Convert UYVY to RGB
+			zs::Frame resultRGBFrame;
+			resultRGBFrame.fourcc = MAKE_FOURCC_CODE('R', 'G', 'B', 'R');
+			if (!converter.Convert(yuy2Frame, resultRGBFrame)) {
+				Assert::Fail(L"Convert function UYVY_to_RGB returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (sourceRGBFrame.width != resultRGBFrame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (sourceRGBFrame.height != resultRGBFrame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (sourceRGBFrame.size != resultRGBFrame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (sourceRGBFrame.frameID != resultRGBFrame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (sourceRGBFrame.sourceID != resultRGBFrame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)resultRGBFrame.size; i = i + 6) {
+				if (abs((int)sourceRGBFrame.data[i] - (int)resultRGBFrame.data[i]) > 1) {
+					Assert::Fail(L"R data not equal");
+					return;
+				}//if...
+				if (abs((int)sourceRGBFrame.data[i + 1] - (int)resultRGBFrame.data[i + 1]) > 1) {
+					Assert::Fail(L"G data not equal");
+					return;
+				}//if...
+				if (abs((int)sourceRGBFrame.data[i + 2] - (int)resultRGBFrame.data[i + 2]) > 1) {
+					Assert::Fail(L"B data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(YUY2_to_BGR24) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create source BGR image
+			zs::Frame sourceBGRFrame;
+			sourceBGRFrame.width = width;
+			sourceBGRFrame.height = height;
+			sourceBGRFrame.fourcc = MAKE_FOURCC_CODE('B', 'G', 'R', 'B');
+			sourceBGRFrame.size = sourceBGRFrame.width * sourceBGRFrame.height * 3;
+			sourceBGRFrame.sourceID = 1;
+			sourceBGRFrame.frameID = 2;
+			sourceBGRFrame.data = new uint8_t[sourceBGRFrame.size];
+
+			// Convert source RGB to UYVY
+			zs::Frame yuy2Frame;
+			yuy2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(sourceBGRFrame, yuy2Frame)) {
+				Assert::Fail(L"Convert function RGB_to_UYVY returned FALSE");
+				return;
+			}//if...
+
+			// Convert UYVY to RGB
+			zs::Frame resultBGRFrame;
+			resultBGRFrame.fourcc = MAKE_FOURCC_CODE('B', 'G', 'R', 'B');
+			if (!converter.Convert(yuy2Frame, resultBGRFrame)) {
+				Assert::Fail(L"Convert function UYVY_to_BGR returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (sourceBGRFrame.width != resultBGRFrame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (sourceBGRFrame.height != resultBGRFrame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (sourceBGRFrame.size != resultBGRFrame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (sourceBGRFrame.frameID != resultBGRFrame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (sourceBGRFrame.sourceID != resultBGRFrame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)resultBGRFrame.size; i = i + 6) {
+				if (abs((int)sourceBGRFrame.data[i] - (int)resultBGRFrame.data[i]) > 1) {
+					Assert::Fail(L"R data not equal");
+					return;
+				}//if...
+				if (abs((int)sourceBGRFrame.data[i + 1] - (int)resultBGRFrame.data[i + 1]) > 1) {
+					Assert::Fail(L"G data not equal");
+					return;
+				}//if...
+				if (abs((int)sourceBGRFrame.data[i + 2] - (int)resultBGRFrame.data[i + 2]) > 1) {
+					Assert::Fail(L"B data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(YUY2_to_UYVY) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create UYVY frame
+			zs::Frame uyvyFrame;
+			uyvyFrame.fourcc = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y');
+			uyvyFrame.width = width;
+			uyvyFrame.height = height;
+			uyvyFrame.frameID = 2;
+			uyvyFrame.sourceID = 1;
+			uyvyFrame.size = uyvyFrame.width * uyvyFrame.height * 2;
+			uyvyFrame.data = new uint8_t[uyvyFrame.size];
+			for (size_t i = 0; i < (size_t)uyvyFrame.size; ++i)
+				uyvyFrame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert frame to YUY2
+			zs::Frame yuy2Frame;
+			yuy2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(uyvyFrame, yuy2Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Convert frame to UYVY
+			zs::Frame resultUYVYFrame;
+			resultUYVYFrame.fourcc = MAKE_FOURCC_CODE('U', 'Y', 'V', 'Y');
+			if (!converter.Convert(yuy2Frame, resultUYVYFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (uyvyFrame.width != resultUYVYFrame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (uyvyFrame.height != resultUYVYFrame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (uyvyFrame.size != resultUYVYFrame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (uyvyFrame.frameID != resultUYVYFrame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (uyvyFrame.sourceID != resultUYVYFrame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)uyvyFrame.size; ++i) {
+				if (uyvyFrame.data[i] != resultUYVYFrame.data[i]) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(YUY2_to_Y800) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create GRAY frame
+			zs::Frame grayFrame;
+			grayFrame.fourcc = MAKE_FOURCC_CODE('Y', '8', '0', '0');
+			grayFrame.width = width;
+			grayFrame.height = height;
+			grayFrame.frameID = 2;
+			grayFrame.sourceID = 1;
+			grayFrame.size = grayFrame.width * grayFrame.height;
+			grayFrame.data = new uint8_t[grayFrame.size];
+			for (size_t i = 0; i < (size_t)grayFrame.size; ++i)
+				grayFrame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert frame to UYVY
+			zs::Frame yuy2Frame;
+			yuy2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(grayFrame, yuy2Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Convert frame to Y800
+			zs::Frame resultGrayFrame;
+			resultGrayFrame.fourcc = MAKE_FOURCC_CODE('Y', '8', '0', '0');
+			if (!converter.Convert(yuy2Frame, resultGrayFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (grayFrame.width != resultGrayFrame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (grayFrame.height != resultGrayFrame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (grayFrame.size != resultGrayFrame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (grayFrame.frameID != resultGrayFrame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (grayFrame.sourceID != resultGrayFrame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)grayFrame.size; ++i) {
+				if (grayFrame.data[i] != resultGrayFrame.data[i]) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(YUY2_to_NV12) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create NV12 frame
+			zs::Frame nv12Frame;
+			nv12Frame.fourcc = MAKE_FOURCC_CODE('N', 'V', '1', '2');
+			nv12Frame.width = width;
+			nv12Frame.height = height;
+			nv12Frame.frameID = 2;
+			nv12Frame.sourceID = 1;
+			nv12Frame.size = nv12Frame.width * (nv12Frame.height + nv12Frame.height / 2);
+			nv12Frame.data = new uint8_t[nv12Frame.size];
+			for (size_t i = 0; i < (size_t)nv12Frame.size; ++i)
+				nv12Frame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert frame to UYVY
+			zs::Frame yuy2Frame;
+			yuy2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(nv12Frame, yuy2Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Convert frame to NV12
+			zs::Frame resultNV12Frame;
+			resultNV12Frame.fourcc = MAKE_FOURCC_CODE('N', 'V', '1', '2');
+			if (!converter.Convert(yuy2Frame, resultNV12Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (nv12Frame.width != resultNV12Frame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (nv12Frame.height != resultNV12Frame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (nv12Frame.size != resultNV12Frame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (nv12Frame.frameID != resultNV12Frame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (nv12Frame.sourceID != resultNV12Frame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)nv12Frame.size; ++i) {
+				if (nv12Frame.data[i] != resultNV12Frame.data[i]) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(YUY2_to_YUV1) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create YUV1 frame
+			zs::Frame yuv1Frame;
+			yuv1Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'V', '1');
+			yuv1Frame.width = width;
+			yuv1Frame.height = height;
+			yuv1Frame.frameID = 2;
+			yuv1Frame.sourceID = 1;
+			yuv1Frame.size = yuv1Frame.width * yuv1Frame.height * 3;
+			yuv1Frame.data = new uint8_t[yuv1Frame.size];
+			for (size_t i = 0; i < (size_t)yuv1Frame.size; ++i)
+				yuv1Frame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert frame to YUY2
+			zs::Frame yuy2Frame;
+			yuy2Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'Y', '2');
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(yuv1Frame, yuy2Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Convert frame to YUV1
+			zs::Frame resultYUV1Frame;
+			resultYUV1Frame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'V', '1');
+			if (!converter.Convert(yuy2Frame, resultYUV1Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (yuv1Frame.width != resultYUV1Frame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (yuv1Frame.height != resultYUV1Frame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (yuv1Frame.size != resultYUV1Frame.size) {
+				Assert::Fail(L"Size not valid");
+				return;
+			}//if...				
+			if (yuv1Frame.frameID != resultYUV1Frame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (yuv1Frame.sourceID != resultYUV1Frame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)resultYUV1Frame.height; i = i + 2) {
+				for (size_t j = 0; j < (size_t)resultYUV1Frame.width; j = j + 2) {
+					if (resultYUV1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3] !=
+						yuv1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3]) {
+						Assert::Fail(L"Y00 Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 3] !=
+						yuv1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 3]) {
+						Assert::Fail(L"Y01 Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[(i + 1) * (size_t)resultYUV1Frame.width * 3 + j * 3] !=
+						yuv1Frame.data[(i + 1) * (size_t)resultYUV1Frame.width * 3 + j * 3]) {
+						Assert::Fail(L"Y10 Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[(i + 1) * (size_t)resultYUV1Frame.width * 3 + j * 3 + 3] !=
+						yuv1Frame.data[(i + 1) * (size_t)resultYUV1Frame.width * 3 + j * 3 + 3]) {
+						Assert::Fail(L"Y11 Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 1] !=
+						yuv1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 1]) {
+						Assert::Fail(L"U Data not equal");
+						return;
+					}//if...
+					if (resultYUV1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 2] !=
+						yuv1Frame.data[i * (size_t)resultYUV1Frame.width * 3 + j * 3 + 2]) {
+						Assert::Fail(L"Y Data not equal");
+						return;
+					}//if...
+				}//for...
+			}//for...
+
+		};//TEST_METHOD...
+
+
 	};
 }
