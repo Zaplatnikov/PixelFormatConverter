@@ -53,6 +53,104 @@ namespace zs {
 		uint32_t frameID;
 		/// Class constructor
 		Frame() : data(nullptr), width(0), height(0), size(0), fourcc(0), sourceID(0), frameID(0) { };
+		/// Class constructor
+		Frame(uint32_t width, uint32_t height, uint32_t fourcc) : data(nullptr), width(0), height(0), size(0), fourcc(0), sourceID(0), frameID(0) {
+			
+			if (width == 0 || height == 0)
+				return;
+			switch (fourcc) {
+			case (uint32_t)ValidFourccCodes::RGB24:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 3;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::BGR24:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 3;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::UYVY:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 2;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::YUY2:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 2;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::Y800:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::NV12:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * (height + height / 2);
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::YUV1:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 3;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::JPEG:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 4;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::JPG2:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 4;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::H264:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 4;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			case (uint32_t)ValidFourccCodes::H265:
+				this->width = width;
+				this->height = height;
+				this->fourcc = fourcc;
+				size = width * height * 4;
+				data = new uint8_t[size];
+				memset(data, 0, size);
+				break;
+			default:
+				return;
+			}		
+		};
 		/// Class destructor
 		~Frame() { delete[] data; };
 
