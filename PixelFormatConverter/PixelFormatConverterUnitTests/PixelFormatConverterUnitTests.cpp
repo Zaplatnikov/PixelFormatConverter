@@ -2457,24 +2457,104 @@ namespace PixelFormatConverterUnitTests
 				for (size_t j = 0; j < (size_t)rgbFrame.width; j = j + 2) {
 					val1 = rgbFrame.data[i * (size_t)rgbFrame.width * 3 + j * 3];
 					val2 = resultRgbFrame.data[i * (size_t)rgbFrame.width * 3 + j * 3];
-					if (abs((int)val1 - (int)val2) > 3) {
+					if (abs((int)val1 - (int)val2) > 20) {
 						Assert::Fail(L"R data not equal");
 						return;
 					}//if...
 					val1 = rgbFrame.data[i * (size_t)rgbFrame.width * 3 + j * 3 + 1];
 					val2 = resultRgbFrame.data[i * (size_t)rgbFrame.width * 3 + j * 3 + 1];
-					if (abs((int)val1 - (int)val2) > 3) {
+					if (abs((int)val1 - (int)val2) > 20) {
 						Assert::Fail(L"G data not equal");
 						return;
 					}//if...
 					val1 = rgbFrame.data[i * (size_t)rgbFrame.width * 3 + j * 3 + 2];
 					val2 = resultRgbFrame.data[i * (size_t)rgbFrame.width * 3 + j * 3 + 2];
-					if (abs((int)val1 - (int)val2) > 3) {
+					if (abs((int)val1 - (int)val2) > 20) {
 						Assert::Fail(L"B data not equal");
 						return;
 					}//if...
 				}//for...
 			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(NV12_to_BGR24) {
+
+			const uint32_t width = 1280;
+			const uint32_t height = 1024;
+
+			// Create RGB frame
+			zs::Frame bgrFrame(width, height, MAKE_FOURCC_CODE('B', 'G', 'R', 'B'));
+			for (size_t i = 0; i < (size_t)bgrFrame.size; ++i)
+				bgrFrame.data[i] = (uint8_t)(rand() % 255);
+
+			// Convert RGB to NV12
+			zs::Frame nv12Frame(width, height, MAKE_FOURCC_CODE('N', 'V', '1', '2'));
+			zs::PixelFormatConverter converter;
+			if (!converter.Convert(bgrFrame, nv12Frame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Convert NV12 to RGB
+			zs::Frame resultBgrFrame(width, height, MAKE_FOURCC_CODE('B', 'G', 'R', 'B'));
+			if (!converter.Convert(nv12Frame, resultBgrFrame)) {
+				Assert::Fail(L"Convert function returned FALSE");
+				return;
+			}//if...
+
+			// Compare atributes
+			if (bgrFrame.width != resultBgrFrame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (bgrFrame.height != resultBgrFrame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (bgrFrame.frameID != resultBgrFrame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (bgrFrame.sourceID != resultBgrFrame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			uint8_t val1;
+			uint8_t val2;
+			for (size_t i = 0; i < (size_t)bgrFrame.height; i = i + 2) {
+				for (size_t j = 0; j < (size_t)bgrFrame.width; j = j + 2) {
+					val1 = bgrFrame.data[i * (size_t)bgrFrame.width * 3 + j * 3];
+					val2 = resultBgrFrame.data[i * (size_t)bgrFrame.width * 3 + j * 3];
+					if (abs((int)val1 - (int)val2) > 20) {
+						Assert::Fail(L"R data not equal");
+						return;
+					}//if...
+					val1 = bgrFrame.data[i * (size_t)bgrFrame.width * 3 + j * 3 + 1];
+					val2 = resultBgrFrame.data[i * (size_t)bgrFrame.width * 3 + j * 3 + 1];
+					if (abs((int)val1 - (int)val2) > 20) {
+						Assert::Fail(L"G data not equal");
+						return;
+					}//if...
+					val1 = bgrFrame.data[i * (size_t)bgrFrame.width * 3 + j * 3 + 2];
+					val2 = resultBgrFrame.data[i * (size_t)bgrFrame.width * 3 + j * 3 + 2];
+					if (abs((int)val1 - (int)val2) > 20) {
+						Assert::Fail(L"B data not equal");
+						return;
+					}//if...
+				}//for...
+			}//for...
+
+		};//TEST_METHOD...
+
+
+		TEST_METHOD(NV12_to_UYVY) {
+
+			
+
 
 		};//TEST_METHOD...
 
