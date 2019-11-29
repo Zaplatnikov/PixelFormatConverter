@@ -135,7 +135,7 @@ bool zs::PixelFormatConverter::Convert(Frame& src, Frame& dst) {
 		case (uint32_t)ValidFourccCodes::RGB24:
 			return NV12_to_RGB24(src, dst);
 		case (uint32_t)ValidFourccCodes::BGR24:
-			return NV12_to_RGB24(src, dst);
+			return NV12_to_BGR24(src, dst);
 		case (uint32_t)ValidFourccCodes::UYVY:
 			return NV12_to_UYVY(src, dst);
 		case (uint32_t)ValidFourccCodes::YUY2:
@@ -1343,7 +1343,7 @@ bool zs::PixelFormatConverter::NV12_to_RGB24(Frame& src, Frame& dst) {
 	dst.frameID = src.frameID;
 
 	float Y00, Y01, Y10, Y11, U, V, R, G, B;
-	size_t p = 0;
+	size_t p = src.height;
 	for (size_t i = 0; i < (size_t)src.height; i = i + 2) {
 		for (size_t j = 0; j < (size_t)src.width; j = j + 2) {
 
@@ -1351,8 +1351,8 @@ bool zs::PixelFormatConverter::NV12_to_RGB24(Frame& src, Frame& dst) {
 			Y01 = (float)src.data[i * src.width + j + 1];
 			Y10 = (float)src.data[(i + 1) * src.width + j];
 			Y11 = (float)src.data[(i + 1) * src.width + j + 1];
-			U = (float)src.data[(src.height + p) * src.width + j];
-			V = (float)src.data[(src.height + p) * src.width + j + 1];
+			U = (float)src.data[p * src.width + j];
+			V = (float)src.data[p * src.width + j + 1];
 
 			R = Y00 + 1.140f * (V - 128.0f);
 			G = Y00 - 0.395f * (U - 128.0f) - 0.581f * (V - 128.0f);
@@ -1411,7 +1411,7 @@ bool zs::PixelFormatConverter::NV12_to_BGR24(Frame& src, Frame& dst) {
 	dst.frameID = src.frameID;
 
 	float Y00, Y01, Y10, Y11, U, V, R, G, B;
-	size_t p = 0;
+	size_t p = src.height;
 	for (size_t i = 0; i < (size_t)src.height; i = i + 2) {
 		for (size_t j = 0; j < (size_t)src.width; j = j + 2) {
 
@@ -1419,8 +1419,8 @@ bool zs::PixelFormatConverter::NV12_to_BGR24(Frame& src, Frame& dst) {
 			Y01 = (float)src.data[i * src.width + j + 1];
 			Y10 = (float)src.data[(i + 1) * src.width + j];
 			Y11 = (float)src.data[(i + 1) * src.width + j + 1];
-			U = (float)src.data[(src.height + p) * src.width + j];
-			V = (float)src.data[(src.height + p) * src.width + j + 1];
+			U = (float)src.data[p * src.width + j];
+			V = (float)src.data[p * src.width + j + 1];
 
 			R = Y00 + 1.140f * (V - 128.0f);
 			G = Y00 - 0.395f * (U - 128.0f) - 0.581f * (V - 128.0f);
