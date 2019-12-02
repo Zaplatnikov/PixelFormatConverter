@@ -2914,5 +2914,49 @@ namespace PixelFormatConverterUnitTests
 
 		};//TEST_METHOD...
 
+
+		TEST_METHOD(Copy_Operator_Test) {
+
+			zs::Frame srcFrame(1280, 1024, MAKE_FOURCC_CODE('B', 'G', 'R', 'B'));
+			for (size_t i = 0; i < (size_t)srcFrame.size; ++i) {
+				srcFrame.data[i] = (uint8_t)(rand() % 255);
+			}//for...
+
+			zs::Frame dstFrame = srcFrame;
+
+			// Compare atributes
+			if (dstFrame.width != srcFrame.width) {
+				Assert::Fail(L"Width not equal");
+				return;
+			}//if...
+			if (dstFrame.height != srcFrame.height) {
+				Assert::Fail(L"Height not equal");
+				return;
+			}//if...
+			if (dstFrame.frameID != srcFrame.frameID) {
+				Assert::Fail(L"frameID not equal");
+				return;
+			}//if...
+			if (dstFrame.size != srcFrame.size) {
+				Assert::Fail(L"Size not equal");
+				return;
+			}//if...
+			if (dstFrame.sourceID != srcFrame.sourceID) {
+				Assert::Fail(L"SourceID not equal");
+				return;
+			}//if...
+
+			// Compare data
+			for (size_t i = 0; i < (size_t)srcFrame.size; ++i) {
+				if (srcFrame.data[i] != dstFrame.data[i]) {
+					Assert::Fail(L"Data not equal");
+					return;
+				}//if...
+			}//for...
+
+			dstFrame.width = 0;
+
+		};//TEST_METHOD...
+
 	};
 }

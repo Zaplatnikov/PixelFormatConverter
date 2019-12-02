@@ -51,11 +51,24 @@ namespace zs {
 		uint32_t sourceID;
 		/// ID of frame
 		uint32_t frameID;
-		/// Class constructor
+		/// Default constructor
 		Frame() : data(nullptr), width(0), height(0), size(0), fourcc(0), sourceID(0), frameID(0) { };
+		/// Copy constructor
+		Frame(const Frame& src) : data(nullptr), width(0), height(0), size(0), fourcc(0), sourceID(0), frameID(0) {
+			this->width = src.width;
+			this->height = src.height;
+			this->fourcc = src.fourcc;
+			this->size = src.size;
+			this->sourceID = src.sourceID;
+			this->frameID = src.frameID;
+			if (this->size > 0) {
+				this->data = new uint8_t[this->size];
+				memcpy(this->data, src.data, this->size);
+			}
+		};
 		/// Class constructor
 		Frame(uint32_t width, uint32_t height, uint32_t fourcc) : data(nullptr), width(0), height(0), size(0), fourcc(0), sourceID(0), frameID(0) {
-			
+
 			if (width == 0 || height == 0)
 				return;
 			switch (fourcc) {
@@ -101,6 +114,25 @@ namespace zs {
 			data = new uint8_t[size];
 			memset(data, 0, size);
 
+		};
+		/// Operator "="
+		Frame& operator= (const Frame& src) {
+
+			if (this != &src) {
+				delete[] data;
+				data = nullptr;
+				this->width = src.width;
+				this->height = src.height;
+				this->fourcc = src.fourcc;
+				this->size = src.size;
+				this->sourceID = src.sourceID;
+				this->frameID = src.frameID;
+				if (this->size > 0) {
+					this->data = new uint8_t[this->size];
+					memcpy(this->data, src.data, this->size);
+				}
+			}
+			return *this;
 		};
 		/// Class destructor
 		~Frame() { delete[] data; };
