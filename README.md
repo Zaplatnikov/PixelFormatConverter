@@ -11,4 +11,4 @@ PixelFormatConverter lib is a free fast cross-platform C++ software library for 
 ### Supported pixel formats:
 
 ### RGB24:
-![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/RGB%20Pixel%20Format.png)
+![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/RGB%20Pixel%20Format%20128h.png)
