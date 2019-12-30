@@ -2,6 +2,7 @@
 // VERSION: 1.0
 // AUTHOR: Zaplatnikov Sergey (s.zaplatnikov@zaplatnikov.com)
 #include <cstdint>
+#include <vector>
 #include <VideoDataStructures.h>
 
 
@@ -34,6 +35,19 @@ namespace zs {
 		\param[out] minor Minor index of version
 		*/
 		void GetVersion(uint32_t& major, uint32_t& minor);
+
+		/**
+		\brief Method for check valid format
+		\param[in] fourcc FOURCC code to check
+		\return TRUE - code is valid, FALSE - code not valid
+		*/
+		bool isFourccCodeValid(uint32_t fourcc);
+
+		/**
+		\brief Get supported FOURCC codes list
+		\return Method return list of supported FOURCC codes
+		*/
+		std::vector<uint32_t> GetSupportedFourccCodes();
 
 	private:
 

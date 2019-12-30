@@ -2047,3 +2047,45 @@ bool zs::PixelFormatConverter::NV12_to_YUV1(Frame& src, Frame& dst) {
 	return true;
 
 }
+
+
+bool zs::PixelFormatConverter::isFourccCodeValid(uint32_t fourcc) {
+
+	switch (fourcc) {
+	case (uint32_t)zs::ValidFourccCodes::RGB24:
+		return true;
+	case (uint32_t)zs::ValidFourccCodes::BGR24:
+		return true;
+	case (uint32_t)zs::ValidFourccCodes::Y800:
+		return true;
+	case (uint32_t)zs::ValidFourccCodes::UYVY:
+		return true;
+	case (uint32_t)zs::ValidFourccCodes::YUY2:
+		return true;
+	case (uint32_t)zs::ValidFourccCodes::YUV1:
+		return true;
+	case (uint32_t)zs::ValidFourccCodes::NV12:
+		return true;
+	default:
+		return false;
+	}
+
+	return false;
+
+}
+
+
+std::vector<uint32_t> zs::PixelFormatConverter::GetSupportedFourccCodes() {
+
+	std::vector<uint32_t> codesList;
+	codesList.push_back((uint32_t)zs::ValidFourccCodes::RGB24);
+	codesList.push_back((uint32_t)zs::ValidFourccCodes::BGR24);
+	codesList.push_back((uint32_t)zs::ValidFourccCodes::Y800);
+	codesList.push_back((uint32_t)zs::ValidFourccCodes::UYVY);
+	codesList.push_back((uint32_t)zs::ValidFourccCodes::YUY2);
+	codesList.push_back((uint32_t)zs::ValidFourccCodes::YUV1);
+	codesList.push_back((uint32_t)zs::ValidFourccCodes::NV12);
+	
+	return codesList;
+
+}
