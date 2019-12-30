@@ -2,6 +2,7 @@
 // VERSION: 1.0
 // AUTHOR: Zaplatnikov Sergey (s.zaplatnikov@zaplatnikov.com)
 #include <cstdint>
+#include <cstring>
 
 
 namespace zs {
@@ -136,6 +137,16 @@ namespace zs {
 		};
 		/// Class destructor
 		~Frame() { delete[] data; };
+		/// Release method
+		void Release() {
+
+			delete[] data;
+			width = 0;
+			height = 0;
+			frameID = 0;
+			size = 0;
+
+		}
 
 	};
 
