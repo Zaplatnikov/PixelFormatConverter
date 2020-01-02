@@ -1013,12 +1013,7 @@ namespace PixelFormatConverterUnitTests
 				yuvImage.data[i] = (uint8_t)(rand() % 255);
 
 			// Create YUV frame
-			zs::Frame yuvFrame;
-			yuvFrame.width = width;
-			yuvFrame.height = height;
-			yuvFrame.fourcc = MAKE_FOURCC_CODE('Y', 'U', 'V', '1');
-			yuvFrame.size = yuvFrame.width * yuvFrame.height * 3;
-			yuvFrame.data = new uint8_t[yuvFrame.size];
+			zs::Frame yuvFrame = zs::Frame(width, height, MAKE_FOURCC_CODE('Y', 'U', 'V', '1'));
 			memcpy(yuvFrame.data, yuvImage.data, yuvFrame.size);
 
 			// Convert image to RGB
