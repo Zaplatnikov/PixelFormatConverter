@@ -38,7 +38,8 @@ The library supports the following pixel formats: **RGBR (RGB24)**, **BGRB (BGR2
 | RGBR (RGB24)             |  BGRB (BGR24) |
 :-------------------------:|:-------------------------:
 ![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/RGBR%20(RGB24)%20Pixel%20Format%2025%25.png) | ![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/BGRB%20(BGR24)%20Pixel%20Format%2025%25.png)
-| Y800 (Grayscale)             |  UYVY |
+
+| Y800 (Grayscale)         |  UYVY |
 :-------------------------:|:-------------------------:
 ![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/Y800%20Pixel%20Format%2025%25.png) | ![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/UYVY%20Pixel%20Format%2025%25.png)
 
