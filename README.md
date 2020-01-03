@@ -1,4 +1,4 @@
-### C++ software library to convert pixel formats VERSION 1.0
+### C++ SOFTWARE LIBRARY FOR CONVERTING PIXEL FORMATS. VERSION 1.0
 
 PixelFormatConverter lib is C++ software library, designed to convert images to various pixel formats (library). The library has a simple interface. The library is distributed as source codes and is compatible with any operating systems that support the C ++ language compiler (C++11 standard). The library includes the following source code files:
 
