@@ -1,4 +1,4 @@
-### C++ software library to convert pixel formats
+### C++ software library to convert pixel formats VERSION 1.0
 
 PixelFormatConverter lib is C++ software library, designed to convert images to various pixel formats (library). The library has a simple interface. The library is distributed as source codes and is compatible with any operating systems that support the C ++ language compiler (C++11 standard). The library includes the following source code files:
 •	**VideoDataStructures.h** is header file describing data structures for images and video frames;
@@ -43,6 +43,13 @@ The library supports the following pixel formats: **RGBR (RGB24)**, **BGRB (BGR2
 :-------------------------:|:-------------------------:
 ![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/Y800%20Pixel%20Format%2025%25.png) | ![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/UYVY%20Pixel%20Format%2025%25.png)
 
+| YUY2         |  YUV1 |
+:-------------------------:|:-------------------------:
+![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/YUY2%20Pixel%20Format%2025%25.png) | ![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/YUV1%20Pixel%20Format%2025%25.png)
+
+| NV12         
+:-------------------------:
+![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/NV12%20Pixel%20Format%2025%25.png)
 
 
 
