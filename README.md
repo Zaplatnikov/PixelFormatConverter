@@ -15,4 +15,4 @@ PixelFormatConverter lib is C++ software library, designed to convert images to 
 The library supports the following pixel formats: **RGBR (RGB24)**, **BGRB (BGR24)**, **UYVY**, **Y800** (grayscale), **YUY2**, **YUV1** and **NV12**. The numerical values of the pixel formats (the value of the FOURCC code) are determined by the ValidFourccCodes enum declared in the VideoDataStructures.h file. The library supports conversion between the specified formats. Bellow illustrations of the location of pixel bytes in various formats for a 4x4 pixel image.
 
 ### RGBR (RGB24):
-![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/RGBR%20(RGB24)%20Pixel%20Format%2050%25.png)
+![](https://github.com/Zaplatnikov/PixelFormatConverter/blob/master/Docs/Source%20images/RGBR%20(RGB24)%20Pixel%20Format%2025%25.png)
